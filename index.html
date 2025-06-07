@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daily Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: #1e1e2f;
+      color: #fff;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+    }
+
+    #pointsDisplay {
+      background: #282846;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .section {
+      margin-bottom: 30px;
+      padding: 20px;
+      border-radius: 15px;
+      background-size: cover;
+      background-position: center;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px);
+      border: 2px solid transparent;
+    }
+
+    #studySection {
+      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+      border-color: #8be9fd;
+    }
+
+    #prayerSection {
+      background: url('https://images.unsplash.com/photo-1546549039-c48f85e12f12?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+      border-color: #ff79c6;
+    }
+
+    /* New improved chores background */
+    #choresSection {
+      background: url('https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+      border-color: #50fa7b;
+      filter: brightness(0.85);
+    }
+
+    label, select, input[type="number"], input[type="text"] {
+      display: block;
+      margin: 10px 0;
+      font-size: 1rem;
+      color: #fff;
+    }
+
+    select, input[type="number"], input[type="text"] {
+      background-color: rgba(46, 46, 62, 0.8);
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      color: white;
+      width: 100%;
+      max-width: 400px;
+      transition: background-color 0.3s ease;
+    }
+    select:hover, input[type="number"]:hover, input[type="text"]:hover {
+      background-color: rgba(46, 46, 62, 1);
+    }
+
+    .checklist {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .checklist label {
+      background: rgba(68, 68, 68, 0.8);
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.3s ease;
+    }
+
+    .checklist label:hover {
+      background: rgba(139, 233, 253, 0.7);
+      color: #000;
+    }
+
+    .checklist input[type="checkbox"] {
+      margin-right: 5px;
+      cursor: pointer;
+    }
+
+    button {
+      padding: 15px 30px;
+      background-color: #8be9fd;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1.1rem;
+      max-width: 600px;
+      width: 100%;
+      margin-top: 10px;
+      align-self: center;
+      box-shadow: 0 0 10px #8be9fd;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #68c3d4;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      color: #ccc;
+      font-size: 0.9rem;
+    }
+
+    /* Calendar Button fixed top-left */
+    #calendarBtn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #ff79c6;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      box-shadow: 0 0 15px #ff79c6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      color: white;
+      z-index: 1000;
+      transition: background-color 0.3s ease;
+    }
+    #calendarBtn:hover {
+      background-color: #e0409f;
+    }
+  </style>
+</head>
+<body>
+  <button id="calendarBtn" title="Open Calendar" aria-label="Open Calendar">📅</button>
+
+  <header>
+    <h1>Daily Tracker</h1>
+    <div id="pointsDisplay">Points: <span id="totalPoints">0</span></div>
+  </header>
+
+  <div id="studySection" class="section">
+    <h2>Study Time 📚</h2>
+    <label for="subject">Select Subject:</label>
+    <select id="subject">
+      <option value="math">Math (2x)</option>
+      <option value="science">Science (1.5x)</option>
+      <option value="english">English (1x)</option>
+    </select>
+    <label for="studyTime">Hours Studied:</label>
+    <input type="number" id="studyTime" min="0" placeholder="e.g., 2" />
+  </div>
+
+  <div id="prayerSection" class="section">
+    <h2>Prayers 🕌</h2>
+    <div class="checklist" id="prayers">
+      <label><input type="checkbox" value="Fajr" />Fajr</label>
+      <label><input type="checkbox" value="Dhuhr" />Dhuhr</label>
+      <label><input type="checkbox" value="Asr" />Asr</label>
+      <label><input type="checkbox" value="Maghrib" />Maghrib</label>
+      <label><input type="checkbox" value="Isha" />Isha</label>
+    </div>
+  </div>
+
+  <div id="choresSection" class="section">
+    <h2>Chores 🌿</h2>
+    <div class="checklist" id="chores">
+      <label><input type="checkbox" value="Cleaned Room" />Cleaned Room</label>
+      <label><input type="checkbox" value="Vacuumed" />Vacuumed</label>
+      <label><input type="checkbox" value="Mopped Floor" />Mopped Floor</label>
+      <label><input type="checkbox" value="Washed Dishes" />Washed Dishes</label>
+      <label><input type="checkbox" value="Fed Cats" />Fed Cats</label>
+    </div>
+  </div>
+
+  <button type="button" onclick="submitData()">Submit</button>
+
+  <footer>
+    Made by Atef
+  </footer>
+
+  <script>
+   const webAppUrl = 'https://script.google.com/macros/s/AKfycbxqVE-FPX9OvkaOhoH-jHNtmLXJcA1oDOyC5pturKINVaOJZSSdIs8jjGhFGw_VLmUO/exec'; // Replace with your actual URL
+let totalPoints = 0;
+const userName = "User"; // Change if needed
+
+function loadPoints() {
+  fetch(webAppUrl + "?name=" + encodeURIComponent(userName))
+    .then(res => res.json())
+    .then(data => {
+      if (data.totalPoints !== undefined) {
+        totalPoints = data.totalPoints;
+        document.getElementById("totalPoints").innerText = Math.floor(totalPoints);
+      }
+    })
+    .catch(err => {
+      console.error("Error loading points:", err);
+    });
+}
+
+function calculatePoints() {
+  const subject = document.getElementById("subject").value;
+  const studyTime = parseFloat(document.getElementById("studyTime").value) || 0;
+  const prayers = document.querySelectorAll("#prayers input:checked").length;
+  const chores = document.querySelectorAll("#chores input:checked").length;
+
+  const multipliers = { math: 2, science: 1.5, english: 1 };
+  const studyPoints = studyTime * multipliers[subject];
+  const prayerPoints = prayers * 5;
+  const chorePoints = chores * 3;
+
+  return {
+    name: userName,
+    studyTime,
+    prayerPoints,
+    earnedPoints: studyPoints + prayerPoints + chorePoints,
+    totalPoints: totalPoints + studyPoints + prayerPoints + chorePoints
+  };
+}
+
+function submitData() {
+  const points = calculatePoints();
+  totalPoints = points.totalPoints;
+  document.getElementById("totalPoints").innerText = Math.floor(totalPoints);
+
+  fetch(webAppUrl, {
+    method: 'POST',
+    body: JSON.stringify(points),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(res => res.json())
+  .then(response => {
+    if (response.status === 'success') {
+      alert("Submitted successfully! Points: " + Math.floor(totalPoints));
+    } else {
+      alert("Failed to submit points: " + response.message);
+    }
+  })
+  .catch(err => {
+    alert("Error submitting data: " + err.message);
+  });
+}
+
+window.onload = loadPoints;
+
+document.getElementById("calendarBtn").addEventListener("click", () => {
+  alert("Calendar overlay will open here!");
+  // Implement calendar popup here
+});
+
+  </script>
+</body>
+</html>
