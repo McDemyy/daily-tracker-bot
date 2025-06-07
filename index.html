@@ -216,30 +216,38 @@
     </div>
   </div>
 
-  <button type="button" onclick="submitData()">Submit</button>
+  <button type="button" onclick="submitDataAndStore()">Submit</button>
 
   <footer>
     Made by Atef
   </footer>
 
   <script>
-   const webAppUrl = 'https://script.google.com/macros/s/AKfycbxqVE-FPX9OvkaOhoH-jHNtmLXJcA1oDOyC5pturKINVaOJZSSdIs8jjGhFGw_VLmUO/exec'; // Replace with your actual URL
+  const supabaseUrl = 'https://bmvewdgylspwhkbzakny.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtdmV3ZGd5bHNwd2hrYnpha255Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyOTU4MTEsImV4cCI6MjA2NDg3MTgxMX0.Vtvg25a4G8OYTJWiRjvZF8mRAKqApz5g9B7Y8Y_ZQZ8';
+
 let totalPoints = 0;
 const userName = "User"; // Change if needed
 
-function loadPoints() {
-  fetch(webAppUrl + "?name=" + encodeURIComponent(userName))
-    .then(res => res.json())
-    .then(data => {
-      if (data.totalPoints !== undefined) {
-        totalPoints = data.totalPoints;
-        document.getElementById("totalPoints").innerText = Math.floor(totalPoints);
-      }
-    })
-    .catch(err => {
-      console.error("Error loading points:", err);
-    });
+async function loadPoints() {
+  const res = await fetch(`${supabaseUrl}/rest/v1/points?name=eq.${encodeURIComponent(userName)}&select=total_points&order=id.desc&limit=1`, {
+    headers: {
+      "apikey": supabaseKey,
+      "Authorization": `Bearer ${supabaseKey}`
+    }
+  });
+
+  if (res.ok) {
+    const data = await res.json();
+    if (data.length > 0) {
+      totalPoints = data[0].total_points;
+      document.getElementById("totalPoints").innerText = Math.floor(totalPoints);
+    }
+  } else {
+    console.error("Failed to load points from Supabase.");
+  }
 }
+
 
 function calculatePoints() {
   const subject = document.getElementById("subject").value;
@@ -261,30 +269,38 @@ function calculatePoints() {
   };
 }
 
-function submitData() {
+fasync function submitDataAndStore() {
   const points = calculatePoints();
   totalPoints = points.totalPoints;
   document.getElementById("totalPoints").innerText = Math.floor(totalPoints);
 
-  fetch(webAppUrl, {
-    method: 'POST',
-    body: JSON.stringify(points),
+  const { studyTime, prayerPoints, earnedPoints, totalPoints: updatedTotal } = points;
+
+  const response = await fetch(`${supabaseUrl}/rest/v1/points`, {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(res => res.json())
-  .then(response => {
-    if (response.status === 'success') {
-      alert("Submitted successfully! Points: " + Math.floor(totalPoints));
-    } else {
-      alert("Failed to submit points: " + response.message);
-    }
-  })
-  .catch(err => {
-    alert("Error submitting data: " + err.message);
+      "Content-Type": "application/json",
+      "apikey": supabaseKey,
+      "Authorization": `Bearer ${supabaseKey}`,
+      "Prefer": "return=representation"
+    },
+    body: JSON.stringify({
+      name: userName,
+      study_time: studyTime,
+      prayer_points: prayerPoints,
+      earned_points: earnedPoints,
+      total_points: updatedTotal
+    })
   });
+
+  if (response.ok) {
+    alert("Submitted successfully! Points: " + Math.floor(totalPoints));
+  } else {
+    const errorData = await response.json();
+    alert("Failed to submit points: " + (errorData.message || "Unknown error"));
+  }
 }
+
 
 window.onload = loadPoints;
 
